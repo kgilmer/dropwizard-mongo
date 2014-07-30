@@ -1,7 +1,9 @@
 package com.eeb.dropwizardmongo.example;
 
+import com.eeb.dropwizardmongo.configuration.DropwizardMongoConfiguration;
 import com.eeb.dropwizardmongo.health.MongoHealthCheck;
 import com.eeb.dropwizardmongo.example.resources.CollectionIdsResource;
+import com.mongodb.DB;
 import com.mongodb.MongoClient;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
@@ -14,20 +16,22 @@ public class DropwizardMongoApplication extends Application<DropwizardMongoConfi
 
     @Override
     public void initialize(Bootstrap<DropwizardMongoConfiguration> bootstrap) {
-        System.out.println();
+
     }
 
     @Override
     public void run(DropwizardMongoConfiguration config, Environment environment) throws Exception {
 
-        MongoClient mongoClient = config.getMongoClientFactory().build(environment);
+        final MongoClient mongoClient = config.getMongoClientFactory().build(environment);
+        final DB db = config.getMongoDBFactory().build(mongoClient);
 
         //Register health checks
         environment.healthChecks().register("mongo",new MongoHealthCheck(mongoClient));
 
         //Register Resources
-        environment.jersey().register(new CollectionIdsResource(mongoClient));
+        environment.jersey().register(new CollectionIdsResource(db));
 
 
     }
 }
+ 

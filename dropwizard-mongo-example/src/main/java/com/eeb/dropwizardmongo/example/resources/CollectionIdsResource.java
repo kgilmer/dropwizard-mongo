@@ -20,20 +20,18 @@ import java.util.List;
 public class CollectionIdsResource {
 
 
-    private MongoClient mongoClient;
+    private DB mongoDB;
 
-    public CollectionIdsResource(MongoClient mongoClient) {
-
-        this.mongoClient = mongoClient;
+    public CollectionIdsResource(DB mongoDB) {
+        this.mongoDB = mongoDB;
     }
 
     @GET
     public List<MongoDocument> fetch(@PathParam("collection") String collection) {
-        DB db = mongoClient.getDB("test");
-        JacksonDBCollection<MongoDocument, String> coll = JacksonDBCollection.wrap(db.getCollection(collection), MongoDocument.class,
+        final JacksonDBCollection<MongoDocument, String> coll = JacksonDBCollection.wrap(mongoDB.getCollection(collection), MongoDocument.class,
                 String.class);
-        DBCursor<MongoDocument> cursor = coll.find();
-        List<MongoDocument> l = new ArrayList<>();
+        final DBCursor<MongoDocument> cursor = coll.find();
+        final List<MongoDocument> l = new ArrayList<>();
 
         try {
             while(cursor.hasNext()) {
@@ -43,9 +41,9 @@ public class CollectionIdsResource {
             cursor.close();
         }
 
-
         return l;
     }
 
 
 }
+ 
